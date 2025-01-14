@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PaslaugaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PaslaugaRepository::class)]
@@ -16,12 +18,19 @@ class Paslauga
     #[ORM\Column(length: 255)]
     private ?string $vardas = null;
 
-    #[ORM\Column]
-    private ?int $kaina = null;
+    #[ORM\Column(length: 255)]
+    private ?string $matas = null;
 
-    #[ORM\ManyToOne(inversedBy: 'paslaugos')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Naudotojas $vadybininkas = null;
+    /**
+     * @var Collection<int, Kaina>
+     */
+    #[ORM\OneToMany(targetEntity: Kaina::class, mappedBy: 'paslauga')]
+    private Collection $kaina;
+
+    public function __construct()
+    {
+        $this->kaina = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -40,26 +49,44 @@ class Paslauga
         return $this;
     }
 
-    public function getKaina(): ?int
+    public function getMatas(): ?string
     {
-        return $this->kaina;
+        return $this->matas;
     }
 
-    public function setKaina(int $kaina): static
+    public function setMatas(string $matas): static
     {
-        $this->kaina = $kaina;
+        $this->matas = $matas;
 
         return $this;
     }
 
-    public function getVadybininkas(): ?Naudotojas
+    /**
+     * @return Collection<int, Kaina>
+     */
+    public function getKaina(): Collection
     {
-        return $this->vadybininkas;
+        return $this->kaina;
     }
 
-    public function setVadybininkas(?Naudotojas $vadybininkas): static
+    public function addKaina(Kaina $kaina): static
     {
-        $this->vadybininkas = $vadybininkas;
+        if (!$this->kaina->contains($kaina)) {
+            $this->kaina->add($kaina);
+            $kaina->setPaslauga($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKaina(Kaina $kaina): static
+    {
+        if ($this->kaina->removeElement($kaina)) {
+            // set the owning side to null (unless already changed)
+            if ($kaina->getPaslauga() === $this) {
+                $kaina->setPaslauga(null);
+            }
+        }
 
         return $this;
     }

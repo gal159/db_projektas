@@ -35,9 +35,17 @@ class Naudotojas implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'naudotojas')]
     private ?Bendrija $bendrija = null;
 
+    /**
+     * @var Collection<int, Bendrija>
+     */
+    #[ORM\OneToMany(targetEntity: Bendrija::class, mappedBy: 'vadybininkas')]
+    private Collection $bendrijos;
+
     public function __construct()
     {
         $this->paslaugos = new ArrayCollection();
+        $this->kainos = new ArrayCollection();
+        $this->bendrijos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,5 +144,34 @@ class Naudotojas implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return 'username';
+    }
+    /**
+     * @return Collection<int, Bendrija>
+     */
+    public function getBendrijos(): Collection
+    {
+        return $this->bendrijos;
+    }
+
+    public function addBendrijo(Bendrija $bendrijo): static
+    {
+        if (!$this->bendrijos->contains($bendrijo)) {
+            $this->bendrijos->add($bendrijo);
+            $bendrijo->setVadybininkas($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBendrijo(Bendrija $bendrijo): static
+    {
+        if ($this->bendrijos->removeElement($bendrijo)) {
+            // set the owning side to null (unless already changed)
+            if ($bendrijo->getVadybininkas() === $this) {
+                $bendrijo->setVadybininkas(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -24,9 +24,20 @@ class Bendrija
     #[ORM\OneToMany(targetEntity: Naudotojas::class, mappedBy: 'bendrija')]
     private Collection $naudotojas;
 
+    /**
+     * @var Collection<int, Kaina>
+     */
+    #[ORM\OneToMany(targetEntity: Kaina::class, mappedBy: 'bedrija')]
+    private Collection $kainos;
+
+    #[ORM\ManyToOne(inversedBy: 'bendrijos')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Naudotojas $vadybininkas = null;
+
     public function __construct()
     {
         $this->naudotojas = new ArrayCollection();
+        $this->kainos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -72,6 +83,48 @@ class Bendrija
                 $naudotoja->setBendrija(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Kaina>
+     */
+    public function getKainos(): Collection
+    {
+        return $this->kainos;
+    }
+
+    public function addKaino(Kaina $kaino): static
+    {
+        if (!$this->kainos->contains($kaino)) {
+            $this->kainos->add($kaino);
+            $kaino->setBedrija($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKaino(Kaina $kaino): static
+    {
+        if ($this->kainos->removeElement($kaino)) {
+            // set the owning side to null (unless already changed)
+            if ($kaino->getBedrija() === $this) {
+                $kaino->setBedrija(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getVadybininkas(): ?Naudotojas
+    {
+        return $this->vadybininkas;
+    }
+
+    public function setVadybininkas(?Naudotojas $vadybininkas): static
+    {
+        $this->vadybininkas = $vadybininkas;
 
         return $this;
     }
