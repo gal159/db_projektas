@@ -22,6 +22,7 @@
             <li>
                 <strong>{{ bendrija.pavadinimas }}</strong>
                 <a href="{{ path('app_vadybininkas_edit_kaina', { bendrijaId: bendrija.id }) }}">Redaguoti kainas</a>
+                <a href="{{ path('app_vadybininkas_show_kaina', { bendrijaId: bendrija.id }) }}">Peržiūrėti kainas</a>
             </li>
         {% endfor %}
     </ul>

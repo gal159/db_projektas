@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paslaugų kainų peržiūra{% endblock %}
+
+{% block body %}
+    <h1>Bendrija: {{ bendrija.pavadinimas }} – paslaugų kainos</h1>
+
+    <table border="1" cellspacing="0" cellpadding="10">
+        <thead>
+        <tr>
+            <th>Paslaugos pavadinimas</th>
+            <th>Matas</th>
+            <th>Kaina (€)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for paslauga in paslaugos %}
+            <tr>
+                <td>{{ paslauga.vardas }}</td>
+                <td>{{ paslauga.matas }}</td>
+                <td>{% set kainaCentoTikslumu = kainos[paslauga.id]|default(0) %}
+                    {{ kainaCentoTikslumu / 100 }} €</td>>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
+{% endblock %}

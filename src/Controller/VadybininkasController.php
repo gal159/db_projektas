@@ -89,4 +89,33 @@ class VadybininkasController extends AbstractController
             'kainos' => $kainos,
         ]);
     }
+    #[Route('/kaina/perziura/{bendrijaId}', name: 'app_vadybininkas_show_kaina')]
+    public function showKainos(
+        int $bendrijaId,
+        BendrijaRepository $bendrijaRepository,
+        PaslaugaRepository $paslaugaRepository,
+        KainaRepository $kainaRepository
+    ): Response {
+        $user = $this->getUser();
+        $bendrija = $bendrijaRepository->find($bendrijaId);
+
+        // Tikriname, ar vadybininkas turi prieigą prie bendrijos
+        if (!$bendrija || $bendrija->getVadybininkas()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Jūs neturite prieigos prie šios bendrijos.');
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+
+        $paslaugos = $paslaugaRepository->findAll();
+        $kainosAssoc = [];
+        foreach ($kainaRepository->findBy(['bendrija' => $bendrija]) as $kaina) {
+            $kainosAssoc[$kaina->getPaslauga()->getId()] = $kaina->getKaina();
+        }
+        return $this->render('vadybininkas/show.html.twig', [
+            'bendrija' => $bendrija,
+            'paslaugos' => $paslaugos,
+            'kainos' => $kainosAssoc,  // Pakeista į asociatyvų masyvą pagal paslaugos ID
+        ]);
+
+    }
+
 }
