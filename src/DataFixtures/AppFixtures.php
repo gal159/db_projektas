@@ -16,13 +16,13 @@ class AppFixtures extends Fixture
         $user = (new Naudotojas())
             ->setUsername("Dziugas")
             ->setPassword("secret")
-            ->setRole("administratorius");
+            ->setRole("ROLE_ADMINISTRATORIUS");
         $manager->persist($user);
 
         $vadybininkas = (new Naudotojas())
             ->setUsername("Augustinas")
             ->setPassword("secret")
-            ->setRole("vadybininkas");
+            ->setRole("ROLE_VADYBININKAS");
         $manager->persist($vadybininkas);
         $manager->flush();
 
@@ -97,31 +97,31 @@ class AppFixtures extends Fixture
         $internetas = $manager->getRepository(Paslauga::class)->findOneBy(["vardas" => "internetas"]);
         foreach ($bendrijos as $bendrija) {
             $kaina = (new Kaina())
-                ->setBedrija($bendrija)
+                ->setBendrija($bendrija)
                 ->setKaina(18)
                 ->setPaslauga($elektra);
             $manager->persist($kaina);
 
             $kaina = (new Kaina())
-                ->setBedrija($bendrija)
+                ->setBendrija($bendrija)
                 ->setKaina(352)
                 ->setPaslauga($vanduo);
             $manager->persist($kaina);
 
             $kaina = (new Kaina())
-                ->setBedrija($bendrija)
+                ->setBendrija($bendrija)
                 ->setKaina(65)
                 ->setPaslauga($dujos);
             $manager->persist($kaina);
 
             $kaina = (new Kaina())
-                ->setBedrija($bendrija)
+                ->setBendrija($bendrija)
                 ->setKaina(981)
                 ->setPaslauga($sildymas);
             $manager->persist($kaina);
 
             $kaina = (new Kaina())
-                ->setBedrija($bendrija)
+                ->setBendrija($bendrija)
                 ->setKaina(1100)
                 ->setPaslauga($internetas);
             $manager->persist($kaina);
@@ -132,7 +132,7 @@ class AppFixtures extends Fixture
 
     Public function loadBendrija(ObjectManager $manager): void
     {
-        $vadybininkai = $manager->getRepository(Naudotojas::class)->findBy(["role" => "vadybininkas"]);
+        $vadybininkai = $manager->getRepository(Naudotojas::class)->findBy(["role" => "ROLE_VADYBININKAS"]);
         for ($i = 1; $i < 11; $i++) {
             $bendrija = (new Bendrija())
                 ->setPavadinimas("Namas Nr. $i")

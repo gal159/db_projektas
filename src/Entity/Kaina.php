@@ -18,7 +18,7 @@ class Kaina
 
     #[ORM\ManyToOne(inversedBy: 'kainos')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Bendrija $bedrija = null;
+    private ?Bendrija $bendrija = null;
 
     #[ORM\ManyToOne(inversedBy: 'kaina')]
     #[ORM\JoinColumn(nullable: false)]
@@ -41,14 +41,14 @@ class Kaina
         return $this;
     }
 
-    public function getBedrija(): ?Bendrija
+    public function getBendrija(): ?Bendrija
     {
-        return $this->bedrija;
+        return $this->bendrija;
     }
 
-    public function setBedrija(?Bendrija $bedrija): static
+    public function setBendrija(?Bendrija $bendrija): static
     {
-        $this->bedrija = $bedrija;
+        $this->bendrija = $bendrija;
 
         return $this;
     }

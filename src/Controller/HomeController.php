@@ -12,6 +12,14 @@ class HomeController extends AbstractController
     #[Route('/home', name: 'app_home')]
     public function home(AuthenticationUtils $authenticationUtils): Response
     {
+        $user = $this->getUser();
+        if ($user && in_array('ROLE_VADYBININKAS', $user->getRoles())) {
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+
+        if ($user && in_array('ROLE_USER', $user->getRoles())) {
+            return $this->redirectToRoute('app_namai');
+        }
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
         return $this->render('home/index.html.twig', [

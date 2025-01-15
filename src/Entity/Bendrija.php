@@ -99,7 +99,7 @@ class Bendrija
     {
         if (!$this->kainos->contains($kaino)) {
             $this->kainos->add($kaino);
-            $kaino->setBedrija($this);
+            $kaino->setBendrija($this);
         }
 
         return $this;
@@ -109,8 +109,8 @@ class Bendrija
     {
         if ($this->kainos->removeElement($kaino)) {
             // set the owning side to null (unless already changed)
-            if ($kaino->getBedrija() === $this) {
-                $kaino->setBedrija(null);
+            if ($kaino->getBendrija() === $this) {
+                $kaino->setBendrija(null);
             }
         }
 

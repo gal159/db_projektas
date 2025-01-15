@@ -1,0 +1,23 @@
+<form method="POST">
+    <table border="1" cellspacing="0" cellpadding="10">
+        <thead>
+        <tr>
+            <th>Paslaugos pavadinimas</th>
+            <th>Matas</th>
+            <th>Kaina (€)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for paslauga in paslaugos %}
+            <tr>
+                <td>{{ paslauga.vardas }}</td>
+                <td>{{ paslauga.matas }}</td>
+                <td>
+                    <input type="number" name="kaina_{{ paslauga.id }}" value="{{ (kainos[paslauga.id]|default(0) / 100) }}" step="0.01">
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Išsaugoti kainas</button>
+</form>

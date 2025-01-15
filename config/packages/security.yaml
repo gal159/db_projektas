@@ -1,6 +1,7 @@
 security:
     role_hierarchy:
         ROLE_USER: ROLE_USER
+        ROLE_VADYBININKAS: [ROLE_USER]
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         App\Entity\Naudotojas:
@@ -22,7 +23,12 @@ security:
             form_login:
                 login_path: app_home
                 check_path: app_home
+                always_use_default_target_path: false
                 default_target_path: app_namai
+            switch_user: true
+            logout:
+                path: app_logout
+                target: app_home
 
 
             # activate different ways to authenticate
@@ -34,7 +40,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-       - { path: ^/namai, roles: ROLE_USER }  # Tik prisijungę naudotojai gali pasiekti "/namai"
+       - { path: ^/namai, roles: ROLE_USER }
+       - { path: ^/vadybininkas, roles: ROLE_VADYBININKAS }
+
 #        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Prisijungimo forma prieinama visiems
 
 when@test:
