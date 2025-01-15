@@ -20,11 +20,9 @@ class NamaiController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function index(PaslaugaRepository $paslaugaRepository, KainaRepository $kainaRepository, NaudotojasRepository $naudotojasRepository): Response
     {
+        /** @var \App\Entity\Naudotojas $user */
         $user = $this->getUser();
-        var_dump($user);
-        $userdata = $naudotojasRepository->findBy(['id' => '1']);
-        var_dump($userdata);
-        $kaina = $kainaRepository->findBy(['bedrija' => $user->getUserIdentifier()]);
+        $kaina = $kainaRepository->findBy(['bedrija' => $user->getBendrija()->getId()]);
         $paslaugos = $paslaugaRepository->findAll();
         return $this->render('namai/index.html.twig', [  // Pakeista į tinkamą failo kelią
             'paslaugos' => $paslaugos,

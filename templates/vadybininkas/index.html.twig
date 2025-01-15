@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redaguoti kainas{% endblock %}
+
+{% block body %}
+    <h1>Bendrija: {{ bendrija.pavadinimas }}</h1>
+    <form method="POST">
+        <table border="1" cellspacing="0" cellpadding="10">
+            <thead>
+            <tr>
+                <th>Paslaugos pavadinimas</th>
+                <th>Matas</th>
+                <th>Kaina (€)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for paslauga in paslaugos %}
+                <tr>
+                    <td>{{ paslauga.vardas }}</td>
+                    <td>{{ paslauga.matas }}</td>
+                    <td>
+                        <input type="number" name="kaina_{{ paslauga.id }}" value="{{ (kainosForm[paslauga.id].kaina / 100) ?? 0 }}" step="0.01">
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Išsaugoti kainas</button>
+    </form>
+
+    {% if app.flashes('success') %}
+        <div style="color: green;">
+            {{ app.flashes('success')|first }}
+        </div>
+    {% endif %}
+{% endblock %}
