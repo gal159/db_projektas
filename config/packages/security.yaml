@@ -2,6 +2,7 @@ security:
     role_hierarchy:
         ROLE_USER: ROLE_USER
         ROLE_VADYBININKAS: [ROLE_USER]
+        ROLE_ADMINISTRATORIUS: [ROLE_VADYBININKAS, ROLE_USER]
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         App\Entity\Naudotojas:
@@ -42,6 +43,7 @@ security:
     access_control:
        - { path: ^/namai, roles: ROLE_USER }
        - { path: ^/vadybininkas, roles: ROLE_VADYBININKAS }
+       - { path: ^/administratorius, roles: ROLE_ADMINISTRATORIUS }
 
 #        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Prisijungimo forma prieinama visiems
 

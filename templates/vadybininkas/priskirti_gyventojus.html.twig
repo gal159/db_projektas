@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Priskirti gyventojus{% endblock %}
+
+{% block body %}
+    <h1>Priskirti gyventojus bendrijai: {{ bendrija.pavadinimas }}</h1>
+
+    <form method="POST">
+        <ul>
+            {% for gyventojas in gyventojai %}
+                <li>
+                    <label>
+                        <input type="checkbox" name="gyventojai[]" value="{{ gyventojas.id }}"
+                               {% if gyventojas.bendrija and gyventojas.bendrija.id == bendrija.id %}checked{% endif %}>
+                        {{ gyventojas.username }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Priskirti</button>
+    </form>
+
+    <a href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
+{% endblock %}

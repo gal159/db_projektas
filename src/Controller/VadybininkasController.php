@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\NaudotojasRepository;
 
 #[Route('/vadybininkas')]
 #[IsGranted('ROLE_VADYBININKAS')]
@@ -46,7 +47,6 @@ class VadybininkasController extends AbstractController
         $user = $this->getUser();
         $bendrija = $bendrijaRepository->find($bendrijaId);
 
-        // Tikriname, ar vadybininkas turi prieigą prie bendrijos
         if (!$bendrija || $bendrija->getVadybininkas()->getId() !== $user->getId()) {
             $this->addFlash('error', 'Jūs neturite prieigos prie šios bendrijos.');
             return $this->redirectToRoute('app_vadybininkas_index');
@@ -55,27 +55,27 @@ class VadybininkasController extends AbstractController
         $paslaugos = $paslaugaRepository->findAll();
         $kainos = $kainaRepository->findBy(['bendrija' => $bendrija]);
 
-        // Tvarkyti POST duomenis, jei formoje paspaudė "Išsaugoti"
         if ($request->isMethod('POST')) {
+            // Pereiname per visas paslaugas ir tikriname POST duomenis
             foreach ($paslaugos as $paslauga) {
                 $kainaReiksme = $request->request->get('kaina_' . $paslauga->getId());
 
-                // Ieškome kainos įrašo pagal bendriją ir paslaugą
-                $kaina = $kainaRepository->findOneBy([
-                    'bendrija' => $bendrija,
-                    'paslauga' => $paslauga,
-                ]);
+                if ($kainaReiksme !== null) {  // Tik jei POST formoje buvo pateikta reikšmė
+                    $kaina = $kainaRepository->findOneBy([
+                        'bendrija' => $bendrija,
+                        'paslauga' => $paslauga,
+                    ]);
 
-                // Jei tokios kainos nėra – sukuriame naują
-                if (!$kaina) {
-                    $kaina = new \App\Entity\Kaina();
-                    $kaina->setBendrija($bendrija);
-                    $kaina->setPaslauga($paslauga);
+                    if (!$kaina) {
+                        $kaina = new \App\Entity\Kaina();
+                        $kaina->setBendrija($bendrija);
+                        $kaina->setPaslauga($paslauga);
+                    }
+
+                    // Atnaujina tik jei reikšmė pateikta formoje
+                    $kaina->setKaina((int) $kainaReiksme * 100);  // Centai
+                    $entityManager->persist($kaina);
                 }
-
-                // Atnaujiname kainą
-                $kaina->setKaina((int) $kainaReiksme * 100);  // Išsaugoma kaina centais
-                $entityManager->persist($kaina);
             }
 
             $entityManager->flush();
@@ -89,6 +89,7 @@ class VadybininkasController extends AbstractController
             'kainos' => $kainos,
         ]);
     }
+
     #[Route('/kaina/perziura/{bendrijaId}', name: 'app_vadybininkas_show_kaina')]
     public function showKainos(
         int $bendrijaId,
@@ -117,5 +118,95 @@ class VadybininkasController extends AbstractController
         ]);
 
     }
+    #[Route('/bendrija/{bendrijaId}/priskirti-gyventojus', name: 'app_vadybininkas_priskirti_gyventojus')]
+    public function priskirtiGyventojus(
+        int $bendrijaId,
+        BendrijaRepository $bendrijaRepository,
+        NaudotojasRepository $naudotojasRepository,
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response {
+        $user = $this->getUser();
+        $bendrija = $bendrijaRepository->find($bendrijaId);
+
+        if (!$bendrija || $bendrija->getVadybininkas()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Jūs neturite prieigos prie šios bendrijos.');
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+
+        $gyventojai = $naudotojasRepository->findBy(['role' => 'ROLE_USER']);
+
+        if ($request->isMethod('POST')) {
+            $pasirinktiGyventojai = $request->request->all('gyventojai');  // Paima tik pažymėtus gyventojus
+
+            foreach ($gyventojai as $gyventojas) {
+                if (in_array($gyventojas->getId(), $pasirinktiGyventojai)) {
+                    // Priskiriame gyventoją tik jei jis buvo pažymėtas
+                    $gyventojas->setBendrija($bendrija);
+                    $entityManager->persist($gyventojas);
+                }
+            }
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Gyventojai sėkmingai priskirti.');
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+
+        return $this->render('vadybininkas/priskirti_gyventojus.html.twig', [
+            'bendrija' => $bendrija,
+            'gyventojai' => $gyventojai,
+        ]);
+    }
+
+
+    #[Route('/bendrija/{bendrijaId}/priskirti-paslaugas', name: 'app_vadybininkas_priskirti_paslaugas')]
+    public function priskirtiPaslaugas(
+        int $bendrijaId,
+        BendrijaRepository $bendrijaRepository,
+        PaslaugaRepository $paslaugaRepository,
+        KainaRepository $kainaRepository,
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response {
+        $user = $this->getUser();
+        $bendrija = $bendrijaRepository->find($bendrijaId);
+
+        if (!$bendrija || $bendrija->getVadybininkas()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Jūs neturite prieigos prie šios bendrijos.');
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+
+        $paslaugos = $paslaugaRepository->findAll();
+
+        if ($request->isMethod('POST')) {
+            $pasirinktosPaslaugos = $request->request->all('paslaugos');
+            foreach ($paslaugos as $paslauga) {
+                if (in_array($paslauga->getId(), $pasirinktosPaslaugos)) {
+                    // Tikriname, ar jau yra tokia paslauga su kaina bendrijai
+                    $kaina = $kainaRepository->findOneBy([
+                        'bendrija' => $bendrija,
+                        'paslauga' => $paslauga,
+                    ]);
+                    if (!$kaina) {
+                        // Jei kainos nėra, sukuriame naują įrašą su 0 €
+                        $kaina = new \App\Entity\Kaina();
+                        $kaina->setBendrija($bendrija);
+                        $kaina->setPaslauga($paslauga);
+                        $kaina->setKaina(0);  // Pradinė kaina 0 €
+                        $entityManager->persist($kaina);
+                    }
+                }
+            }
+            $entityManager->flush();
+            $this->addFlash('success', 'Paslaugos sėkmingai priskirtos.');
+            return $this->redirectToRoute('app_vadybininkas_index');
+        }
+        return $this->render('vadybininkas/priskirti_paslaugas.html.twig', [
+            'bendrija' => $bendrija,
+            'paslaugos' => $paslaugos,
+        ]);
+    }
+
+
 
 }

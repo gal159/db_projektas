@@ -1,0 +1,13 @@
+<form method="POST">
+    <ul>
+        {% for paslauga in paslaugos %}
+            <li>
+                <label>
+                    <input type="checkbox" name="paslaugos[]" value="{{ paslauga.id }}">
+                    {{ paslauga.vardas }} ({{ paslauga.matas }})
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Priskirti paslaugas</button>
+</form>

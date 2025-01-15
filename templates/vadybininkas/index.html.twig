@@ -23,6 +23,8 @@
                 <strong>{{ bendrija.pavadinimas }}</strong>
                 <a href="{{ path('app_vadybininkas_edit_kaina', { bendrijaId: bendrija.id }) }}">Redaguoti kainas</a>
                 <a href="{{ path('app_vadybininkas_show_kaina', { bendrijaId: bendrija.id }) }}">Peržiūrėti kainas</a>
+                <a href="{{ path('app_vadybininkas_priskirti_gyventojus', { bendrijaId: bendrija.id }) }}">Priskirti gyventojus</a>
+                <a href="{{ path('app_vadybininkas_priskirti_paslaugas', { bendrijaId: bendrija.id }) }}">Priskirti paslaugas</a>
             </li>
         {% endfor %}
     </ul>

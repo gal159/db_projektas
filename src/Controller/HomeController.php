@@ -13,6 +13,11 @@ class HomeController extends AbstractController
     public function home(AuthenticationUtils $authenticationUtils): Response
     {
         $user = $this->getUser();
+
+        if ($this->isGranted('ROLE_ADMINISTRATORIUS')) {
+            return $this->redirectToRoute('app_administratorius_index');
+        }
+
         if ($user && in_array('ROLE_VADYBININKAS', $user->getRoles())) {
             return $this->redirectToRoute('app_vadybininkas_index');
         }
