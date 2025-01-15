@@ -25,7 +25,7 @@ security:
                 login_path: app_home
                 check_path: app_home
                 always_use_default_target_path: false
-                default_target_path: app_namai
+                default_target_path: app_home
             switch_user: true
             logout:
                 path: app_logout

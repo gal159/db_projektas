@@ -133,7 +133,8 @@ class Naudotojas implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+
+        return is_array($this->role) ? $this->role : [$this->role];
     }
 
     public function eraseCredentials()

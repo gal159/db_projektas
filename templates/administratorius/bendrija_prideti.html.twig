@@ -1,0 +1,19 @@
+<form method="POST">
+    <h3>Pridėti naują bendriją</h3>
+    <div class="form-group">
+        <label for="pavadinimas">Bendrijos pavadinimas:</label>
+        <input type="text" id="pavadinimas" name="pavadinimas" required class="form-control">
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="vadybininkas">Pasirinkite vadybininką:</label>
+        <select id="vadybininkas" name="vadybininkas" required class="form-control">
+            <option value="">-- Pasirinkti vadybininką --</option>
+            {% for vadybininkas in vadybininkai %}
+                <option value="{{ vadybininkas.id }}">{{ vadybininkas.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Pridėti</button>
+</form>

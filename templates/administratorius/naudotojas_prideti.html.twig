@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pridėti naudotoją{% endblock %}
+
+{% block body %}
+    <h1>Pridėti naują naudotoją</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="vardas">Vardas:</label>
+            <input type="text" id="vardas" name="vardas" required class="form-control">
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="pavarde">Pavardė:</label>
+            <input type="text" id="pavarde" name="pavarde" required class="form-control">
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="role">Rolė:</label>
+            <select id="role" name="role" required class="form-control">
+                <option value="">-- Pasirinkite rolę --</option>
+                <option value="ROLE_USER">Gyventojas (ROLE_USER)</option>
+                <option value="ROLE_VADYBININKAS">Vadybininkas (ROLE_VADYBININKAS)</option>
+                <option value="ROLE_ADMINISTRATORIUS">Administratorius (ROLE_ADMINISTRATORIUS)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Pridėti</button>
+    </form>
+
+    <a href="{{ path('app_administratorius_index') }}" class="btn btn-secondary mt-3">Grįžti atgal</a>
+{% endblock %}

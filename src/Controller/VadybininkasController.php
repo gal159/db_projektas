@@ -73,7 +73,7 @@ class VadybininkasController extends AbstractController
                     }
 
                     // Atnaujina tik jei reikšmė pateikta formoje
-                    $kaina->setKaina((int) $kainaReiksme * 100);  // Centai
+                    $kaina->setKaina((int) $kainaReiksme);  // Centai
                     $entityManager->persist($kaina);
                 }
             }
@@ -108,7 +108,8 @@ class VadybininkasController extends AbstractController
 
         $paslaugos = $paslaugaRepository->findAll();
         $kainosAssoc = [];
-        foreach ($kainaRepository->findBy(['bendrija' => $bendrija]) as $kaina) {
+        $kainos = $kainaRepository->findBy(['bendrija' => $bendrija]);
+        foreach ($kainos as $kaina) {
             $kainosAssoc[$kaina->getPaslauga()->getId()] = $kaina->getKaina();
         }
         return $this->render('vadybininkas/show.html.twig', [
@@ -177,16 +178,19 @@ class VadybininkasController extends AbstractController
         }
 
         $paslaugos = $paslaugaRepository->findAll();
+        $paskirtosPaslaugos = [];
 
         if ($request->isMethod('POST')) {
             $pasirinktosPaslaugos = $request->request->all('paslaugos');
             foreach ($paslaugos as $paslauga) {
+
                 if (in_array($paslauga->getId(), $pasirinktosPaslaugos)) {
                     // Tikriname, ar jau yra tokia paslauga su kaina bendrijai
                     $kaina = $kainaRepository->findOneBy([
                         'bendrija' => $bendrija,
                         'paslauga' => $paslauga,
                     ]);
+
                     if (!$kaina) {
                         // Jei kainos nėra, sukuriame naują įrašą su 0 €
                         $kaina = new \App\Entity\Kaina();
@@ -199,7 +203,7 @@ class VadybininkasController extends AbstractController
             }
             $entityManager->flush();
             $this->addFlash('success', 'Paslaugos sėkmingai priskirtos.');
-            return $this->redirectToRoute('app_vadybininkas_index');
+            return $this->redirectToRoute('app_vadybininkas_priskirti_paslaugas', ['bendrijaId' => $bendrijaId]);
         }
         return $this->render('vadybininkas/priskirti_paslaugas.html.twig', [
             'bendrija' => $bendrija,

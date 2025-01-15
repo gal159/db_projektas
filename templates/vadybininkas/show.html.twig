@@ -18,8 +18,8 @@
             <tr>
                 <td>{{ paslauga.vardas }}</td>
                 <td>{{ paslauga.matas }}</td>
-                <td>{% set kainaCentoTikslumu = kainos[paslauga.id]|default(0) %}
-                    {{ kainaCentoTikslumu / 100 }} €</td>>
+                <td>{{ paslauga.id }}</td>
+                <td>{{ kainos[paslauga.id] }} €</td>>
             </tr>
         {% endfor %}
         </tbody>

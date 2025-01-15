@@ -33,18 +33,32 @@ class AdministratoriusController extends AbstractController
     }
 
     #[Route('/bendrija/prideti', name: 'app_administratorius_bendrija_prideti')]
-    public function pridetiBendrija(Request $request, EntityManagerInterface $entityManager): Response {
+    public function pridetiBendrija(Request $request, EntityManagerInterface $entityManager, NaudotojasRepository $naudotojasRepository): Response
+    {
+        $vadybininkai = $naudotojasRepository->findBy(['role' => 'ROLE_VADYBININKAS']);  // Paimame visus vadybininkus
+
         if ($request->isMethod('POST')) {
             $pavadinimas = $request->request->get('pavadinimas');
+            $vadybininkasId = $request->request->get('vadybininkas');
+
+            $vadybininkas = $naudotojasRepository->find($vadybininkasId);
+
             $bendrija = new Bendrija();
             $bendrija->setPavadinimas($pavadinimas);
+            $bendrija->setVadybininkas($vadybininkas);  // Priskiriame vadybininką
+
             $entityManager->persist($bendrija);
             $entityManager->flush();
+
             $this->addFlash('success', 'Bendrija sėkmingai sukurta!');
             return $this->redirectToRoute('app_administratorius_index');
         }
-        return $this->render('administratorius/bendrija_prideti.html.twig');
+
+        return $this->render('administratorius/bendrija_prideti.html.twig', [
+            'vadybininkai' => $vadybininkai,
+        ]);
     }
+
 
     #[Route('/bendrija/salinti/{id}', name: 'app_administratorius_bendrija_salinti')]
     public function salintiBendrija(int $id, BendrijaRepository $bendrijaRepository, EntityManagerInterface $entityManager): Response {
@@ -91,20 +105,25 @@ class AdministratoriusController extends AbstractController
     #[Route('/naudotojas/prideti', name: 'app_administratorius_naudotojas_prideti')]
     public function pridetiNaudotoja(Request $request, EntityManagerInterface $entityManager): Response {
         if ($request->isMethod('POST')) {
-            $username = $request->request->get('username');
-            $password = $request->request->get('password');
+            $vardas = $request->request->get('vardas');
+            $pavarde = $request->request->get('pavarde');
             $role = $request->request->get('role');
+
             $naudotojas = new Naudotojas();
-            $naudotojas->setUsername($username);
-            $naudotojas->setPassword($password);  // Naudok slaptažodžių šifravimą!
+            $naudotojas->setUsername($vardas);  // Automatiškai nustatomas naudotojo vardas kaip "vardas"
+            $naudotojas->setPassword($pavarde);  // Automatiškai nustatomas slaptažodis kaip "pavardė"
             $naudotojas->setRole($role);
+
             $entityManager->persist($naudotojas);
             $entityManager->flush();
+
             $this->addFlash('success', 'Naudotojas sėkmingai pridėtas!');
             return $this->redirectToRoute('app_administratorius_index');
         }
+
         return $this->render('administratorius/naudotojas_prideti.html.twig');
     }
+
 
     #[Route('/naudotojas/salinti/{id}', name: 'app_administratorius_naudotojas_salinti')]
     public function salintiNaudotoja(int $id, NaudotojasRepository $naudotojasRepository, EntityManagerInterface $entityManager): Response {

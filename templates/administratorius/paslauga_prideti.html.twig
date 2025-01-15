@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pridėti paslaugą{% endblock %}
+
+{% block body %}
+    <h1>Pridėti naują paslaugą</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="vardas">Paslaugos pavadinimas:</label>
+            <input type="text" id="vardas" name="vardas" required class="form-control">
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="matas">Paslaugos matavimo vienetas (pvz., €/m³, €/kWh):</label>
+            <input type="text" id="matas" name="matas" required class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Pridėti</button>
+    </form>
+
+    <a href="{{ path('app_administratorius_index') }}" class="btn btn-secondary mt-3">Grįžti atgal</a>
+{% endblock %}
