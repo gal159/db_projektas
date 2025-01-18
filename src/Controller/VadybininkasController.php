@@ -63,7 +63,7 @@ class VadybininkasController extends AbstractController
         // Gauname kainas ir jas konvertuojame į asociatyvų masyvą
         $kainos = [];
         foreach ($kainaRepository->findBy(['bendrija' => $bendrija]) as $kaina) {
-            $kainos[$kaina->getPaslauga()->getId()] = $kaina->getKaina();
+            $kainos[$kaina->getPaslauga()->getId()] = $kaina->getKaina()*100;
         }
 
         if ($request->isMethod('POST')) {
