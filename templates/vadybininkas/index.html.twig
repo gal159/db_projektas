@@ -17,17 +17,28 @@
         </div>
     {% endfor %}
 
-    <ul>
+    <table border="1" cellspacing="0" cellpadding="10">
+        <thead>
+        <tr>
+            <th>Bendrijos pavadinimas</th>
+            <th>Redaguoti kainas</th>
+            <th>Peržiūrėti kainas</th>
+            <th>Priskirti gyventojus</th>
+            <th>Priskirti paslaugas</th>
+        </tr>
+        </thead>
+        <tbody>
         {% for bendrija in bendrijos %}
-            <li>
-                <strong>{{ bendrija.pavadinimas }}</strong>
-                <a href="{{ path('app_vadybininkas_edit_kaina', { bendrijaId: bendrija.id }) }}">Redaguoti kainas</a>
-                <a href="{{ path('app_vadybininkas_show_kaina', { bendrijaId: bendrija.id }) }}">Peržiūrėti kainas</a>
-                <a href="{{ path('app_vadybininkas_priskirti_gyventojus', { bendrijaId: bendrija.id }) }}">Priskirti gyventojus</a>
-                <a href="{{ path('app_vadybininkas_priskirti_paslaugas', { bendrijaId: bendrija.id }) }}">Priskirti paslaugas</a>
-            </li>
+            <tr>
+                <td><strong>{{ bendrija.pavadinimas }}</strong></td>
+                <td><a href="{{ path('app_vadybininkas_edit_kaina', { bendrijaId: bendrija.id }) }}">Redaguoti kainas</a></td>
+                <td><a href="{{ path('app_vadybininkas_show_kaina', { bendrijaId: bendrija.id }) }}">Peržiūrėti kainas</a></td>
+                <td><a href="{{ path('app_vadybininkas_priskirti_gyventojus', { bendrijaId: bendrija.id }) }}">Priskirti gyventojus</a></td>
+                <td><a href="{{ path('app_vadybininkas_priskirti_paslaugas', { bendrijaId: bendrija.id }) }}">Priskirti paslaugas</a></td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 
     {% if bendrijos|length == 0 %}
         <p>Jums nepriskirta jokia bendrija.</p>

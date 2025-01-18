@@ -2,11 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Namai!{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}komunalinės paslaugos{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
 <div class="content-wrapper">
+    <a href="/logout" class="button-link">logout</a>
     {% block body %}
 
     {% endblock %}

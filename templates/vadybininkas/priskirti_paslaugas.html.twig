@@ -1,16 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Priskirti paslaugas{% endblock %}
+
 {% block body %}
+
+<h1>Priskirti paslaugas bendrijai: <strong>{{ bendrija.pavadinimas }}</strong></h1>
+
 <form method="POST">
-    <ul>
+    <div class="priskyrimo-list">
         {% for paslauga in paslaugos %}
-            <li>
-                <label>
-                    <input type="checkbox" name="paslaugos[]" value="{{ paslauga.id }}">
-                    {{ paslauga.vardas }} ({{ paslauga.matas }})
-                </label>
-            </li>
+            <label class="priskyrimo-item gyventojas">
+                <input type="checkbox" name="paslaugos[]" value="{{ paslauga.id }}"
+                       {% if paslauga.id in pazymetosPaslaugos %}checked{% endif %}>
+                <span>{{ paslauga.vardas }} ({{ paslauga.matas }})</span>
+            </label>
         {% endfor %}
-    </ul>
+    </div>
+
     <button type="submit">Priskirti paslaugas</button>
 </form>
-{% endblock %}
 
+    <a  class="button-link" href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
+{% endblock%}

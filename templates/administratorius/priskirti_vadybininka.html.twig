@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Priskirti vadybininką{% endblock %}
+
+{% block body %}
+    <h1>Priskirti vadybininką bendrijai: <strong>{{ bendrija.pavadinimas }}</strong></h1>
+
+    <form method="POST">
+        <label for="vadybininkas">Pasirinkite vadybininką:</label>
+        <select name="vadybininkas" id="vadybininkas" required>
+            {% for vadybininkas in vadybininkai %}
+                <option value="{{ vadybininkas.id }}"
+                        {% if bendrija.vadybininkas and bendrija.vadybininkas.id == vadybininkas.id %}selected{% endif %}>
+                    {{ vadybininkas.username }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Priskirti vadybininką</button>
+    </form>
+
+    <a class="button-link" href="{{ path('app_administratorius_index') }}">Grįžti į bendrijų sąrašą</a>
+{% endblock %}

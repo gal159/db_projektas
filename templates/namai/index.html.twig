@@ -16,12 +16,12 @@
             </tr>
             </thead>
             <tbody>
-            {% for i in 0..4 %}
+            {% for paslauga in paslaugos %}
                 <tr>
-                    <td>{{ paslaugos[i].vardas }}</td>
+                    <td>{{ paslauga.paslauga }}</td>
 
-                    <td>{{ kaina[i].kaina / 100 }} </td>
-                    <td>{{ paslaugos[i].matas }} </td>
+                    <td>{{ paslauga.kaina / 100 }} </td>
+                    <td>{{ paslauga.matas }} </td>
 
                 </tr>
             {% endfor %}

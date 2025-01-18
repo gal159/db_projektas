@@ -9,9 +9,20 @@
     <a href="{{ path('app_administratorius_bendrija_prideti') }}">Pridėti bendriją</a>
     <ul>
         {% for bendrija in bendrijos %}
-            <li>{{ bendrija.pavadinimas }} <a href="{{ path('app_administratorius_bendrija_salinti', {id: bendrija.id}) }}">Šalinti</a></li>
+            <li>
+                {{ bendrija.pavadinimas }}
+                - Vadybininkas:
+                {% if bendrija.vadybininkas %}
+                    {{ bendrija.vadybininkas.username }}
+                {% else %}
+                    <em>Nepriskirtas</em>
+                {% endif %}
+                <a href="{{ path('app_administratorius_priskirti_vadybininka', {id: bendrija.id}) }}">Priskirti vadybininką</a>
+                <a href="{{ path('app_administratorius_bendrija_salinti', {id: bendrija.id}) }}">Šalinti</a>
+            </li>
         {% endfor %}
     </ul>
+
 
     <h2>Paslaugos</h2>
     <a href="{{ path('app_administratorius_paslauga_prideti') }}">Pridėti paslaugą</a>

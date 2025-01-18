@@ -9,21 +9,23 @@
         <thead>
         <tr>
             <th>Paslaugos pavadinimas</th>
-            <th>Matas</th>
             <th>Kaina (€)</th>
+            <th>Matas</th>
         </tr>
         </thead>
         <tbody>
         {% for paslauga in paslaugos %}
-            <tr>
-                <td>{{ paslauga.vardas }}</td>
-                <td>{{ paslauga.matas }}</td>
-                <td>{{ paslauga.id }}</td>
-                <td>{{ kainos[paslauga.id] }} €</td>>
-            </tr>
+            {% set kaina = kainos[paslauga.id] | default(0) / 100 %}
+            {% if kaina > 0 %}
+                <tr>
+                    <td>{{ paslauga.vardas }}</td>
+                    <td>{{ kaina }} €</td>
+                    <td>{{ paslauga.matas }}</td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
+{#    <button type="submit">Išsaugoti gyventojus</button>#}
+    <a class="button-link" href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
 {% endblock %}

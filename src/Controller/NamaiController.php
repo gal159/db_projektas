@@ -36,11 +36,18 @@ class NamaiController extends AbstractController
             ]);
         }
             $kaina = $kainaRepository->findBy(['bendrija' => $user->getBendrija()->getId()]);
+            $data = [];
+            $i = 0;
+            foreach ($kaina as $kaina) {
+                $data[$i]['kaina'] = $kaina->getKaina();
+                $data[$i]['paslauga'] = $kaina->getPaslauga()->getVardas();
+                $data[$i]['matas'] = $kaina->getPaslauga()->getMatas();
+                $i++;
+            }
 
         $paslaugos = $paslaugaRepository->findAll();
         return $this->render('namai/index.html.twig', [  // Pakeista į tinkamą failo kelią
-            'paslaugos' => $paslaugos,
-            'kaina' => $kaina,
+            'paslaugos' => $data,
         ]);
     }
 

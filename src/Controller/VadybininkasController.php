@@ -53,14 +53,24 @@ class VadybininkasController extends AbstractController
         }
 
         $paslaugos = $paslaugaRepository->findAll();
-        $kainos = $kainaRepository->findBy(['bendrija' => $bendrija]);
+
+        // Gauti paslaugas, kurios jau priskirtos šiai bendrijai
+        $pazymetosPaslaugos = [];
+        foreach ($kainaRepository->findBy(['bendrija' => $bendrija]) as $kaina) {
+            $pazymetosPaslaugos[] = $kaina->getPaslauga()->getId();
+        }
+
+        // Gauname kainas ir jas konvertuojame į asociatyvų masyvą
+        $kainos = [];
+        foreach ($kainaRepository->findBy(['bendrija' => $bendrija]) as $kaina) {
+            $kainos[$kaina->getPaslauga()->getId()] = $kaina->getKaina();
+        }
 
         if ($request->isMethod('POST')) {
-            // Pereiname per visas paslaugas ir tikriname POST duomenis
             foreach ($paslaugos as $paslauga) {
                 $kainaReiksme = $request->request->get('kaina_' . $paslauga->getId());
 
-                if ($kainaReiksme !== null) {  // Tik jei POST formoje buvo pateikta reikšmė
+                if ($kainaReiksme !== null) {
                     $kaina = $kainaRepository->findOneBy([
                         'bendrija' => $bendrija,
                         'paslauga' => $paslauga,
@@ -72,8 +82,7 @@ class VadybininkasController extends AbstractController
                         $kaina->setPaslauga($paslauga);
                     }
 
-                    // Atnaujina tik jei reikšmė pateikta formoje
-                    $kaina->setKaina((int) $kainaReiksme);  // Centai
+                    $kaina->setKaina((int) $kainaReiksme );
                     $entityManager->persist($kaina);
                 }
             }
@@ -87,8 +96,10 @@ class VadybininkasController extends AbstractController
             'bendrija' => $bendrija,
             'paslaugos' => $paslaugos,
             'kainos' => $kainos,
+            'pazymetosPaslaugos' => $pazymetosPaslaugos,  // Pridedame į Twig šabloną
         ]);
     }
+
 
     #[Route('/kaina/perziura/{bendrijaId}', name: 'app_vadybininkas_show_kaina')]
     public function showKainos(
@@ -178,39 +189,51 @@ class VadybininkasController extends AbstractController
         }
 
         $paslaugos = $paslaugaRepository->findAll();
-        $paskirtosPaslaugos = [];
+
+        // Surandame jau pažymėtas paslaugas (jos turi kainą)
+        $pazymetosPaslaugos = [];
+        $kainos = $kainaRepository->findBy(['bendrija' => $bendrija]);
+        foreach ($kainos as $kaina) {
+            $pazymetosPaslaugos[] = $kaina->getPaslauga()->getId();
+        }
 
         if ($request->isMethod('POST')) {
             $pasirinktosPaslaugos = $request->request->all('paslaugos');
+
+            // Pereiname per visas paslaugas ir atnaujiname jų priskyrimą
             foreach ($paslaugos as $paslauga) {
+                $kaina = $kainaRepository->findOneBy([
+                    'bendrija' => $bendrija,
+                    'paslauga' => $paslauga,
+                ]);
 
                 if (in_array($paslauga->getId(), $pasirinktosPaslaugos)) {
-                    // Tikriname, ar jau yra tokia paslauga su kaina bendrijai
-                    $kaina = $kainaRepository->findOneBy([
-                        'bendrija' => $bendrija,
-                        'paslauga' => $paslauga,
-                    ]);
-
+                    // Jei paslauga pasirinkta, bet dar neturi kainos – sukuriame naują įrašą
                     if (!$kaina) {
-                        // Jei kainos nėra, sukuriame naują įrašą su 0 €
                         $kaina = new \App\Entity\Kaina();
                         $kaina->setBendrija($bendrija);
                         $kaina->setPaslauga($paslauga);
-                        $kaina->setKaina(0);  // Pradinė kaina 0 €
+                        $kaina->setKaina(0);
                         $entityManager->persist($kaina);
+                    }
+                } else {
+                    // Jei paslauga anksčiau buvo pasirinkta, bet dabar atžymėta – pašaliname
+                    if ($kaina) {
+                        $entityManager->remove($kaina);
                     }
                 }
             }
+
             $entityManager->flush();
             $this->addFlash('success', 'Paslaugos sėkmingai priskirtos.');
-            return $this->redirectToRoute('app_vadybininkas_priskirti_paslaugas', ['bendrijaId' => $bendrijaId]);
+            return $this->redirectToRoute('app_vadybininkas_index');
         }
+
         return $this->render('vadybininkas/priskirti_paslaugas.html.twig', [
             'bendrija' => $bendrija,
             'paslaugos' => $paslaugos,
+            'pazymetosPaslaugos' => $pazymetosPaslaugos, // Siunčiame į Twig šabloną
         ]);
     }
-
-
 
 }

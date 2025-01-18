@@ -3,22 +3,21 @@
 {% block title %}Priskirti gyventojus{% endblock %}
 
 {% block body %}
-    <h1>Priskirti gyventojus bendrijai: {{ bendrija.pavadinimas }}</h1>
+    <div class="container">
+        <h1>Priskirti gyventojus bendrijai: <strong>{{ bendrija.pavadinimas }}</strong></h1>
 
-    <form method="POST">
-        <ul>
-            {% for gyventojas in gyventojai %}
-                <li>
-                    <label>
+        <form method="POST">
+            <div class="gyventojai-list">
+                {% for gyventojas in gyventojai %}
+                    <label class="gyventojas">
                         <input type="checkbox" name="gyventojai[]" value="{{ gyventojas.id }}"
                                {% if gyventojas.bendrija and gyventojas.bendrija.id == bendrija.id %}checked{% endif %}>
                         {{ gyventojas.username }}
                     </label>
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="submit">Priskirti</button>
-    </form>
+                {% endfor %}
+            </div>
 
-    <a href="{{ path('app_vadybininkas_index') }}">Grįžti į bendrijų sąrašą</a>
+            <button type="submit">Išsaugoti gyventojus</button>
+        </form>
+    </div>
 {% endblock %}

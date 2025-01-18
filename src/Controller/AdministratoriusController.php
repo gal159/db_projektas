@@ -137,4 +137,45 @@ class AdministratoriusController extends AbstractController
         }
         return $this->redirectToRoute('app_administratorius_index');
     }
+
+    #[Route('/bendrija/{id}/priskirti-vadybininka', name: 'app_administratorius_priskirti_vadybininka')]
+    public function priskirtiVadybininka(
+        int $id,
+        BendrijaRepository $bendrijaRepository,
+        NaudotojasRepository $naudotojasRepository,
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response {
+        $bendrija = $bendrijaRepository->find($id);
+
+        if (!$bendrija) {
+            $this->addFlash('error', 'Bendrija nerasta.');
+            return $this->redirectToRoute('app_administratorius_index');
+        }
+
+        // Paimame visus vartotojus, kurie turi rolę "ROLE_VADYBININKAS"
+        $vadybininkai = $naudotojasRepository->findBy(['role' => 'ROLE_VADYBININKAS']);
+
+        if ($request->isMethod('POST')) {
+            $vadybininkasId = $request->request->get('vadybininkas');
+            $vadybininkas = $naudotojasRepository->find($vadybininkasId);
+
+            if (!$vadybininkas) {
+                $this->addFlash('error', 'Vadybininkas nerastas.');
+            } else {
+                $bendrija->setVadybininkas($vadybininkas);
+                $entityManager->persist($bendrija);
+                $entityManager->flush();
+                $this->addFlash('success', 'Vadybininkas sėkmingai priskirtas!');
+            }
+
+            return $this->redirectToRoute('app_administratorius_index');
+        }
+
+        return $this->render('administratorius/priskirti_vadybininka.html.twig', [
+            'bendrija' => $bendrija,
+            'vadybininkai' => $vadybininkai,
+        ]);
+    }
+
 }
